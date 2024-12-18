@@ -1,0 +1,164 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cstdlib> // Untuk fungsi rand() dan srand()
+#include <ctime>   // Untuk fungsi time()
+#include <algorithm> // Untuk fungsi shuffle
+#include <iomanip>  // Untuk manipulasi format output (setw)
+
+// Fungsi untuk memilih elemen acak dari vector
+std::string pilihAcak(const std::vector<std::string>& data) {
+    if (data.empty()) {
+        return "Data kosong! Tidak ada yang bisa dipilih.";
+    }
+    int indeks = rand() % data.size(); // Menghasilkan indeks acak
+    return data[indeks];
+}
+
+// Fungsi untuk menampilkan semua data
+void tampilkanData(const std::vector<std::string>& data) {
+    if (data.empty()) {
+        std::cout << "Data kosong! Tidak ada yang bisa ditampilkan." << std::endl;
+        return;
+    }
+    std::cout << "Data yang tersedia: " << std::endl;
+    for (size_t i = 0; i < data.size(); ++i) {
+        std::cout << i + 1 << ". " << data[i] << std::endl;
+    }
+}
+
+// Fungsi untuk menambah data
+void tambahData(std::vector<std::string>& data) {
+    std::cout << "Masukkan data (pisahkan dengan koma, contoh: Apel,Jeruk,Mangga): ";
+    std::cin.ignore(); // Membersihkan buffer input
+    std::string input;
+    std::getline(std::cin, input);
+
+    size_t pos = 0;
+    while ((pos = input.find(',')) != std::string::npos) {
+        std::string item = input.substr(0, pos);
+        data.push_back(item);
+        input.erase(0, pos + 1);
+    }
+    if (!input.empty()) { // Menambahkan item terakhir
+        data.push_back(input);
+    }
+
+    std::cout << "Data berhasil ditambahkan!" << std::endl;
+}
+
+// Fungsi untuk membagi kelompok
+void bagiKelompok(const std::vector<std::string>& data) {
+    if (data.empty()) {
+        std::cout << "Data kosong! Tidak ada yang bisa dibagi menjadi kelompok." << std::endl;
+        return;
+    }
+
+    int jumlahKelompok, anggotaPerKelompok;
+    std::cout << "Masukkan jumlah kelompok yang ingin dibuat: ";
+    std::cin >> jumlahKelompok;
+    std::cout << "Masukkan jumlah anggota per kelompok: ";
+    std::cin >> anggotaPerKelompok;
+
+    std::vector<std::string> dataAcak = data; // Salin data asli
+    std::random_shuffle(dataAcak.begin(), dataAcak.end()); // Acak data
+
+    bool ulangAcak = true;
+
+    do {
+        std::cout << "\nHasil pembagian kelompok:" << std::endl;
+
+        // Menampilkan tabel header
+        std::cout << std::setw(12) << std::left << "Kelompok" 
+                  << std::setw(25) << "Anggota" << std::endl;
+        std::cout << "---------------------------------------------" << std::endl;
+
+        int anggotaDitampilkan = 0;
+        for (int i = 1; i <= jumlahKelompok; ++i) {
+            std::cout << std::setw(12) << std::left << "Kelompok " << i << ": ";
+            bool adaAnggota = false;
+
+            // Menampilkan anggota kelompok
+            for (int j = 0; j < anggotaPerKelompok; ++j) {
+                if (anggotaDitampilkan < dataAcak.size()) {
+                    std::cout << std::setw(25) << dataAcak[anggotaDitampilkan];
+                    anggotaDitampilkan++;
+                    adaAnggota = true;
+                } else {
+                    std::cout << std::setw(25) << "-"; // Menampilkan tanda "-" jika anggota kurang
+                }
+            }
+
+            // Menambahkan baris baru setelah setiap kelompok
+            std::cout << std::endl;
+        }
+
+        // Menanyakan apakah ingin mengacak ulang
+        char pilihan;
+        std::cout << "\nApakah Anda ingin mengacak ulang pembagian kelompok? (Y/N): ";
+        std::cin >> pilihan;
+
+        if (pilihan == 'Y' || pilihan == 'y') {
+            std::random_shuffle(dataAcak.begin(), dataAcak.end()); // Acak ulang data
+        } else {
+            ulangAcak = false; // Berhenti jika pengguna tidak ingin mengacak ulang
+        }
+
+    } while (ulangAcak); // Terus ulang selama pengguna memilih 'Y'
+}
+
+// Fungsi untuk menampilkan menu awal
+void tampilkanMenuAwal() {
+    std::cout << "=============================================" << std::endl;
+    std::cout << "     RandomSelector: Aplikasi Pemilihan       " << std::endl;
+    std::cout << "      Data Acak Otomatis Berbasis C++   " << std::endl;
+    std::cout << "=============================================" << std::endl;
+    std::cout << "Program ini dibuat oleh: Wahyu Akbar Pratama" << std::endl;
+    std::cout << "Prodi: Ilmu Komunikasi" << std::endl;
+    std::cout << "NIM: 24368036" << std::endl;
+    std::cout << "=============================================" << std::endl;}
+
+int main() {
+    std::vector<std::string> data; // Menyimpan data yang diberikan
+    int pilihan;
+    srand(static_cast<unsigned>(time(0))); // Inisialisasi angka acak
+
+    // Menampilkan menu awal
+    tampilkanMenuAwal();
+
+    do {
+        // Menampilkan menu utama
+        std::cout << "\n=== Menu ===" << std::endl;
+        std::cout << "1. Tambah Data" << std::endl;
+        std::cout << "2. Tampilkan Data" << std::endl;
+        std::cout << "3. Pilih Data Secara Acak" << std::endl;
+        std::cout << "4. Bagi Kelompok" << std::endl;
+        std::cout << "5. Keluar" << std::endl;
+        std::cout << "Pilih menu: ";
+        std::cin >> pilihan;
+
+        switch (pilihan) {
+        case 1:
+            tambahData(data); // Menambah data
+            break;
+        case 2:
+            tampilkanData(data); // Menampilkan data
+            break;
+        case 3: {
+            std::string hasil = pilihAcak(data);
+            std::cout << "Data yang dipilih secara acak: " << hasil << std::endl;
+            break;
+        }
+        case 4:
+            bagiKelompok(data); // Membagi kelompok
+            break;
+        case 5:
+            std::cout << "Keluar dari program. Terima kasih!" << std::endl;
+            break;
+        default:
+            std::cout << "Pilihan tidak valid. Coba lagi." << std::endl;
+        }
+    } while (pilihan != 5);
+
+    return 0;
+}
